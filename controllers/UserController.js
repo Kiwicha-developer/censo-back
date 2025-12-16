@@ -9,10 +9,10 @@ exports.getAllUsers = async (req, res) => {
       users.push({ id: doc.id, ...doc.data() });
     });
 
-    res.status(200).json(users);
+    return  res.status(200).json(users);
   } catch (error) {
     console.error("Error al obtener usuarios:", error);
-    res.status(500).json({ error: "Error al obtener usuarios." });
+    return  res.status(500).json({ error: "Error al obtener usuarios." });
   }
 };
 
@@ -21,18 +21,30 @@ exports.createUser = async (req, res) => {
     const db = req.db;
     const { dni, pass, nombre } = req.body;
 
-    // Codificar contraseña en Base64
-    const encodedPass = Buffer.from(pass, 'utf8').toString('base64');
+    const userRef = db.collection("users");
+    const snaUser = await userRef.where("dni", "==", dni).get();
 
-    const docRef = await db.collection('users').add({
+    if (!snaUser.empty) {
+      const userData = snaUser.docs[0].data();
+      return res
+        .status(409)
+        .json({ error: `El usuario con el dni ${userData.dni} ya existe` });
+    }
+
+    // Codificar contraseña en Base64
+    const encodedPass = Buffer.from(pass, "utf8").toString("base64");
+
+    const docRef = await db.collection("users").add({
       dni,
       pass: encodedPass,
-      nombre
+      nombre,
+      rol: "usuario",
+      activo: true,
     });
 
-    res.status(201).json({ id: docRef.id, dni, nombre });
+    return res.status(201).json({ id: docRef.id, dni, nombre });
   } catch (error) {
     console.error("Error al crear usuario:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    return res.status(500).json({ error: "Error interno del servidor" });
   }
 };
