@@ -2,7 +2,9 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const db = require('./config/firebase');
+
 const app = express();
 //RUTAS
 const testRoute = require('./routes/test');
@@ -12,6 +14,7 @@ const personaRoute = require('./routes/PersonaRoute');
 //PUERTOS
 const PORT = 3000;
 
+app.use(cors());
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true })); 
 
