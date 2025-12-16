@@ -72,7 +72,35 @@ exports.updateUser = async (req, res) => {
 
     return res.status(200).json(updatedUser);
   } catch (error) {
-    console.error("Error al crear usuario:", error);
+    console.error("Error al actualizar usuario:", error);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+exports.updatePassword = async (req, res) => {
+  try {
+    const db = req.db;
+    const {id, pass } = req.body;
+
+    const userRef = db.collection("users").doc(id);
+    const userSnap = await userRef.get();
+
+    if (!userSnap.exists) {
+      return res.status(400).json({ error: "El usuario no se encontró" });
+    }
+
+    const passEncoded = Buffer.from(pass, "utf8").toString("base64");
+
+    await userRef.update({
+      pass: passEncoded,
+    });
+
+    const updatedDoc = await userRef.get();
+    const updatedUser = { id: updatedDoc.id, ...updatedDoc.data() };
+
+    return res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error al reestablecer contraseña:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 };

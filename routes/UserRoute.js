@@ -10,4 +10,6 @@ router.post('/create',protected, userController.createUser);
 
 router.post('/update',protected, userController.updateUser);
 
+router.post('/resetpass',protected, userController.updatePassword);
+
 module.exports = router;
