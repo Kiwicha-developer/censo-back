@@ -8,4 +8,6 @@ router.get('/all',protected, userController.getAllUsers);
 
 router.post('/create',protected, userController.createUser);
 
+router.post('/update',protected, userController.updateUser);
+
 module.exports = router;
