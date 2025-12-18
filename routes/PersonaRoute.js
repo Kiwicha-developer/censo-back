@@ -5,4 +5,6 @@ const personaController = require('../controllers/PersonaController');
 
 router.get('/bydate',protected,personaController.getPersonasByDate);
 
+router.post('/create',protected,personaController.createPersona);
+
 module.exports = router;
