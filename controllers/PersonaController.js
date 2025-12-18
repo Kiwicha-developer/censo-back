@@ -28,7 +28,11 @@ exports.getPersonasByDate = async (req, res) => {
       .where("fechaCreacion", ">=", start.toDate())
       .where("fechaCreacion", "<=", end.toDate());
 
-    if (userData) {
+    if (docuser) {
+      if (!userData) {
+        // Si se pidió docuser pero no existe en "user", devolvemos vacío directamente
+        return res.status(200).json([]);
+      }
       query = query.where("iduser", "==", userData.id);
     }
 
