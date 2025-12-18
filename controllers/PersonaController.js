@@ -19,16 +19,17 @@ exports.getPersonasByDate = async (req, res) => {
       .where("dni", "==", docuser)
       .get();
 
-
-    let iduser = userSnap.empty ? "" : userSnap.docs[0].id;
+    const userData = userSnap.empty ? null : {
+      id: userSnap.docs[0].id,
+      ...userSnap.docs[0].data()
+    };
 
     let query = db.collection("person")
-      .where("fechaCreacion", ">=", moment(startdate, "DD/MM/YYYY").toDate())
-      .where("fechaCreacion", "<=", moment(enddate, "DD/MM/YYYY").toDate());
+      .where("fechaCreacion", ">=", start.toDate())
+      .where("fechaCreacion", "<=", end.toDate());
 
-    // Si viene iduser, agregamos filtro
-    if (iduser) {
-      query = query.where("iduser", "==", iduser);
+    if (userData) {
+      query = query.where("iduser", "==", userData.id);
     }
 
     const snapshot = await query.get();
@@ -43,7 +44,8 @@ exports.getPersonasByDate = async (req, res) => {
           : null,
         fechaNam: data.fechaNam 
           ? moment(data.fechaNam.toDate()).format("DD/MM/YYYY") 
-          : null
+          : null,
+        usuario: userData ? userData.nombre : null
       };
     });
 
@@ -53,6 +55,7 @@ exports.getPersonasByDate = async (req, res) => {
     res.status(500).json({ error: "Error al obtener personas." });
   }
 };
+
 
 
 exports.createPersona = async (req,res) =>{
