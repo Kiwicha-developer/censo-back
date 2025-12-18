@@ -2,37 +2,50 @@ const moment = require("moment");
 
 exports.getPersonasByDate = async (req, res) => {
   try {
-    const db = req.db; 
+    const db = req.db;
     const { startdate, enddate, docuser } = req.query;
 
-    const start = moment(startdate, "DD-MM-YYYY");
-    const end = moment(enddate, "DD-MM-YYYY");
+    const start = moment(startdate, ["YYYY-MM-DD", "DD-MM-YYYY"], true);
+    const end = moment(enddate, ["YYYY-MM-DD", "DD-MM-YYYY"], true);
 
     if (!start.isValid() || !end.isValid()) {
       return res.status(400).json({ error: "Formato de fecha inválido." });
     }
+
     if (start.isAfter(end)) {
       return res.status(400).json({ error: "La fecha inicial no puede ser mayor a la final." });
     }
 
-    const userSnap = await db.collection("users")
-      .where("dni", "==", docuser)
-      .get();
+    const startDate = start.startOf("day").toDate();
+    const endDate = end.endOf("day").toDate();
 
-    const userData = userSnap.empty ? null : {
-      id: userSnap.docs[0].id,
-      ...userSnap.docs[0].data()
-    };
+    const cleanDocUser = docuser?.trim();
 
-    let query = db.collection("person")
-      .where("fechaCreacion", ">=", start.toDate())
-      .where("fechaCreacion", "<=", end.toDate());
+    let userData = null;
 
-    if (docuser) {
-      if (!userData) {
-        // Si se pidió docuser pero no existe en "user", devolvemos vacío directamente
+    if (cleanDocUser) {
+      const userSnap = await db
+        .collection("users")
+        .where("dni", "==", cleanDocUser)
+        .limit(1)
+        .get();
+
+      if (userSnap.empty) {
         return res.status(200).json([]);
       }
+
+      userData = {
+        id: userSnap.docs[0].id,
+        ...userSnap.docs[0].data()
+      };
+    }
+
+    let query = db
+      .collection("person")
+      .where("fechaCreacion", ">=", startDate)
+      .where("fechaCreacion", "<=", endDate);
+
+    if (userData) {
       query = query.where("iduser", "==", userData.id);
     }
 
@@ -43,22 +56,23 @@ exports.getPersonasByDate = async (req, res) => {
       return {
         id: doc.id,
         ...data,
-        fechaCreacion: data.fechaCreacion 
-          ? moment(data.fechaCreacion.toDate()).format("DD-MM-YYYY") 
+        fechaCreacion: data.fechaCreacion
+          ? moment(data.fechaCreacion.toDate()).format("DD-MM-YYYY")
           : null,
-        fechaNam: data.fechaNam 
-          ? moment(data.fechaNam.toDate()).format("DD-MM-YYYY") 
+        fechaNam: data.fechaNam
+          ? moment(data.fechaNam.toDate()).format("DD-MM-YYYY")
           : null,
-        usuario: userData ? userData.nombre : null
+        usuario: userData?.nombre ?? null
       };
     });
 
     return res.status(200).json(personas);
   } catch (error) {
     console.error("Error al obtener personas:", error);
-    res.status(500).json({ error: "Error al obtener personas." });
+    return res.status(500).json({ error: "Error al obtener personas." });
   }
 };
+
 
 
 
