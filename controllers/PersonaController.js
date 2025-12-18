@@ -15,7 +15,7 @@ exports.getPersonasByDate = async (req, res) => {
       return res.status(400).json({ error: "La fecha inicial no puede ser mayor a la final." });
     }
 
-    const userSnap = await db.collection("user")
+    const userSnap = await db.collection("users")
       .where("dni", "==", docuser)
       .get();
 
