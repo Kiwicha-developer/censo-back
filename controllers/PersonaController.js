@@ -73,9 +73,6 @@ exports.getPersonasByDate = async (req, res) => {
   }
 };
 
-
-
-
 exports.createPersona = async (req,res) =>{
     try {
     const db = req.db; 
@@ -113,7 +110,6 @@ exports.createPersona = async (req,res) =>{
       fechaCreacion: new Date()
     });
 
-    //aca faltaaaaa
 
     const newDocSnap = await newDocRef.get();
 
@@ -121,5 +117,34 @@ exports.createPersona = async (req,res) =>{
   } catch (error) {
     console.error("Error al crear persona:", error);
     res.status(500).json({ error: "Error al crear persona." });
+  }
+}
+
+exports.deletePersona = async (req,res) =>{
+  try {
+    const db = req.db;
+    const { id } = req.query;
+
+    if (!id) {
+      return res.status(400).json({ error: "ID requerido" });
+    }
+
+    const docRef = db.collection("person").doc(id);
+    const docSnap = await docRef.get();
+
+    if (!docSnap.exists) {
+      return res.status(404).json({ error: "La persona no existe" });
+    }
+
+    await docRef.delete();
+
+    return res.status(200).json({
+      message: "Persona eliminada correctamente",
+      id
+    });
+
+  } catch (error) {
+    console.error("Error al eliminar persona:", error);
+    return res.status(500).json({ error: "Error al eliminar persona." });
   }
 }
