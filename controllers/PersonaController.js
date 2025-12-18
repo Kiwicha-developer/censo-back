@@ -3,7 +3,24 @@ const moment = require("moment");
 exports.getPersonasByDate = async (req, res) => {
   try {
     const db = req.db; 
-    const { startdate, enddate, iduser } = req.query;
+    const { startdate, enddate, docuser } = req.query;
+
+    const start = moment(startdate, "DD/MM/YYYY");
+    const end = moment(enddate, "DD/MM/YYYY");
+
+    if (!start.isValid() || !end.isValid()) {
+      return res.status(400).json({ error: "Formato de fecha inválido." });
+    }
+    if (start.isAfter(end)) {
+      return res.status(400).json({ error: "La fecha inicial no puede ser mayor a la final." });
+    }
+
+    const userSnap = await db.collection("user")
+      .where("dni", "==", docuser)
+      .get();
+
+
+    let iduser = userSnap.empty ? "" : userSnap.docs[0].id;
 
     let query = db.collection("person")
       .where("fechaCreacion", ">=", moment(startdate, "DD/MM/YYYY").toDate())
