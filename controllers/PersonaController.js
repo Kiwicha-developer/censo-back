@@ -113,7 +113,19 @@ exports.createPersona = async (req,res) =>{
 
     const newDocSnap = await newDocRef.get();
 
-    return res.status(201).json({ id: newDocSnap.id, ...newDocSnap.data() });
+    const data = newDocSnap.data();
+
+    return res.status(201).json({
+      id: newDocSnap.id,
+      ...data,
+      fechaNam: data.fechaNam
+        ? moment(data.fechaNam.toDate()).format("DD-MM-YYYY")
+        : null,
+      fechaCreacion: data.fechaCreacion
+        ? moment(data.fechaCreacion.toDate()).format("DD-MM-YYYY")
+        : null
+    });
+
   } catch (error) {
     console.error("Error al crear persona:", error);
     res.status(500).json({ error: "Error al crear persona." });
