@@ -5,8 +5,8 @@ exports.getPersonasByDate = async (req, res) => {
     const db = req.db; 
     const { startdate, enddate, docuser } = req.query;
 
-    const start = moment(startdate, "DD/MM/YYYY");
-    const end = moment(enddate, "DD/MM/YYYY");
+    const start = moment(startdate, "DD-MM-YYYY");
+    const end = moment(enddate, "DD-MM-YYYY");
 
     if (!start.isValid() || !end.isValid()) {
       return res.status(400).json({ error: "Formato de fecha inválido." });
@@ -44,10 +44,10 @@ exports.getPersonasByDate = async (req, res) => {
         id: doc.id,
         ...data,
         fechaCreacion: data.fechaCreacion 
-          ? moment(data.fechaCreacion.toDate()).format("DD/MM/YYYY") 
+          ? moment(data.fechaCreacion.toDate()).format("DD-MM-YYYY") 
           : null,
         fechaNam: data.fechaNam 
-          ? moment(data.fechaNam.toDate()).format("DD/MM/YYYY") 
+          ? moment(data.fechaNam.toDate()).format("DD-MM-YYYY") 
           : null,
         usuario: userData ? userData.nombre : null
       };
@@ -89,7 +89,7 @@ exports.createPersona = async (req,res) =>{
       doc,
       estadoCivil,
       estudios,
-      fechaNam: moment(fechaNam, "DD/MM/YYYY").toDate(),
+      fechaNam: moment(fechaNam, "DD-MM-YYYY").toDate(),
       idioma,
       ingresos,
       nombres,
