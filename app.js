@@ -11,6 +11,7 @@ const testRoute = require('./routes/test');
 const userRoute = require('./routes/UserRoute');
 const loginRoute = require('./routes/LoginRoute');
 const personaRoute = require('./routes/PersonaRoute');
+const dataRoute = require("./routes/DataRoute");
 //PUERTOS
 const PORT = 3000;
 
@@ -29,6 +30,7 @@ app.use('/test', testRoute);
 app.use('/user', userRoute);
 app.use('/login', loginRoute);
 app.use('/persona', personaRoute);
+app.use('/data',dataRoute);
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
