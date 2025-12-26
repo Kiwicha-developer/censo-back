@@ -11,7 +11,7 @@ exports.dataByDiscapacidad = async (req, res) => {
     const total = personTotSnap.size;
 
     return res.status(200).json({
-    total,
+    nodiscapacitados:total - personSnap.size,
     discapacitados: personSnap.size
     });
   } catch (error) {
