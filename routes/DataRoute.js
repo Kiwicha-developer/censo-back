@@ -9,6 +9,6 @@ router.get("/estadocivil",protected,dataController.dataByEstadoCivil);
 
 router.get("/estudios",protected,dataController.dataByEstudios);
 
-router.get("/genero",protected,dataController.dataByEstudios);
+router.get("/genero",protected,dataController.dataByGeneros);
 
 module.exports = router;
